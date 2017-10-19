@@ -104,12 +104,12 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
       double geneta = genCand.eta();
       int gencharge = genCand.charge();
       double mass = genCand.mass();
-      int pdgid = genCand.pdgId()
+      int pdgid = genCand.pdgId();
 
       if( status != 1 || gencharge == 0 ) continue;
 
-      if( fabs(pdgid) = 13 ) numOfMuons++; 
-      if( fabs(pdgid) = 11 ) numOfElections++;
+      if( fabs(pdgid) == 13 ) numOfMuons++; 
+      if( fabs(pdgid) == 11 ) numOfElections++;
 
     }
 
