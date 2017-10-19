@@ -106,6 +106,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
     double numOfElections = 0;
     vector< vector<double>> MuonListPositive;
     vector< vector<double>> MuonListNegative;
+    vector<double> momentum;
 
     for(unsigned it=0; it<genParticleCollection->size(); ++it) {
 
@@ -124,6 +125,8 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
 
       vector<double> fourVectorPositive;
       vector<double> fourVectorNegative;
+
+      momentum.push_back(genpt);
 
       if( status != 1 || gencharge == 0 ) continue;
 
@@ -166,17 +169,17 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
       for(unsigned j = 0; j < MuonListNegative.size(); j++){
   
         double s2 = GetInvariantMass(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3], MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
-
         diMuonMass->Fill(s2);
+        for( int k = 0; k < momentum.size(); k++){
 
+          MassVsPt->Fill(s2, momentum[k]);
+
+        }
       }
     }
 
-
-
     MuonsHist->Fill( numOfMuons );
     ElectronsHist->Fill( numOfElections );
-
 
   }
 
@@ -216,6 +219,7 @@ QuantumEntanglementInPP::beginJob()
   MuonsHist = fs->make<TH1D>("MuonsHist",";MuonsHist",100,0,100);
   ElectronsHist = fs->make<TH1D>("ElectronsHist",";ElectronsHist",100,0,100);
   diMuonMass = fs->make<TH1D>("diMuonMass",";diMuonMass",200,0,200);
+  MassVsPt = fs->make<TH2D>("MassVsPt",";MassVsPt",200,0,200,1000,0,100);
 
 }
 
