@@ -36,10 +36,13 @@ QuantumEntanglementInPP::QuantumEntanglementInPP(const edm::ParameterSet& iConfi
   trackName_  =  iConfig.getParameter<edm::InputTag>("trackName");
   vertexName_ =  iConfig.getParameter<edm::InputTag>("vertexName");
   towerName_ =  iConfig.getParameter<edm::InputTag>("towerName");
-
+  
+  genSrc_ = consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genSrc"));
   trackSrc_ = consumes<reco::TrackCollection>(trackName_);
   vertexSrc_ = consumes<reco::VertexCollection>(vertexName_);
   towerSrc_ = consumes<CaloTowerCollection>(towerName_);
+
+  genSrc_ = consumes<genPar
 
   Nmin_ = iConfig.getUntrackedParameter<int>("Nmin");
   Nmax_ = iConfig.getUntrackedParameter<int>("Nmax");
