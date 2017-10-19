@@ -114,7 +114,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
     }
 
     MuonsHist->Fill( numOfMuons );
-    ElectionsHist->Fill( numOfElections );
+    ElectronsHist->Fill( numOfElections );
 
 
   }
@@ -154,7 +154,7 @@ QuantumEntanglementInPP::beginJob()
 
 
   MuonsHist = fs->make<TH1D>("MuonsHist",";MuonsHist",100,0,100);
-  ElectionsHist = fs->make<TH1D>("ElectionsHist",";ElectionsHist",100,0,100);
+  ElectronsHist = fs->make<TH1D>("ElectronsHist",";ElectronsHist",100,0,100);
 
 }
 
