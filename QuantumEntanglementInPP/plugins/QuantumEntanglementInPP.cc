@@ -141,6 +141,12 @@ QuantumEntanglementInPP::beginJob()
   trk_eta = fs->make<TH1D>("trk_eta", ";#eta", 50,-2.5,2.5);
 
 }
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+QuantumEntanglementInPP::endJob() 
+{
+}
 TComplex 
 QuantumEntanglementInPP::q_vector(double n, double p, double w, double phi) 
 {
@@ -148,13 +154,6 @@ QuantumEntanglementInPP::q_vector(double n, double p, double w, double phi)
   TComplex e(1, n*phi, 1);
   return term1*e;
 }
-// ------------ method called once each job just after ending the event loop  ------------
-void 
-QuantumEntanglementInPP::endJob() 
-{
-}
-
-
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
 QuantumEntanglementInPP::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
