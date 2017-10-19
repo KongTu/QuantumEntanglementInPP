@@ -90,22 +90,33 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
    using namespace std;
 
    if( doGenParticle_ ){
+
     edm::Handle<reco::GenParticleCollection> genParticleCollection;
     iEvent.getByToken(genSrc_, genParticleCollection);
     
+    double numOfMuons = 0;
+    double numOfElections = 0;
+
     for(unsigned it=0; it<genParticleCollection->size(); ++it) {
 
       const reco::GenParticle & genCand = (*genParticleCollection)[it];
       int status = genCand.status();
-      //double geneta = genCand.eta();
+      double geneta = genCand.eta();
       int gencharge = genCand.charge();
-      //double genrapidity = genCand.rapidity();
       double mass = genCand.mass();
+      int pdgid = genCand.pdgId()
 
       if( status != 1 || gencharge == 0 ) continue;
 
-       cout << "mass " << mass << endl;
+      if( fabs(pdgid) = 13 ) numOfMuons++; 
+      if( fabs(pdgid) = 11 ) numOfElections++;
+
     }
+
+    MuonsHist->Fill( numOfMuons );
+    ElectionsHist->Fill( numOfElections );
+
+
   }
 
 }
@@ -140,6 +151,10 @@ QuantumEntanglementInPP::beginJob()
   hfPhi = fs->make<TH1D>("hfPhi", ";#phi", 700, -3.5, 3.5);
   trkPt = fs->make<TH1D>("trkPt", ";p_{T}(GeV)", Nptbins,ptBinsArray);
   trk_eta = fs->make<TH1D>("trk_eta", ";#eta", 50,-2.5,2.5);
+
+
+  MuonsHist = fs->make<TH1D>("MuonsHist",";MuonsHist",100,0,100);
+  ElectionsHist = fs->make<TH1D>("ElectionsHist",";ElectionsHist",100,0,100);
 
 }
 

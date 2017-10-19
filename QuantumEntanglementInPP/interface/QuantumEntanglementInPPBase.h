@@ -184,6 +184,9 @@ class QuantumEntanglementInPP : public edm::EDAnalyzer {
       TH1D* trk_eta;
       TH1D* cbinHist;
 
+      TH1D* MuonsHist;
+      TH1D* ElectronsHist;
+
       int Nmin_;
       int Nmax_;
 
