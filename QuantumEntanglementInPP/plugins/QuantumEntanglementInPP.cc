@@ -16,43 +16,8 @@
 //
 //
 
+#include "QuantumEntanglementInPP/QuantumEntanglementInPP/interface/QuantumEntanglementInPPBase.h"
 
-// system include files
-#include <memory>
-
-// user include files
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/one/EDAnalyzer.h"
-
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-//
-// class declaration
-//
-
-// If the analyzer does not use TFileService, please remove
-// the template argument to the base class so the class inherits
-// from  edm::one::EDAnalyzer<> and also remove the line from
-// constructor "usesResource("TFileService");"
-// This will improve performance in multithreaded jobs.
-
-class QuantumEntanglementInPP : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
-   public:
-      explicit QuantumEntanglementInPP(const edm::ParameterSet&);
-      ~QuantumEntanglementInPP();
-
-      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
-
-   private:
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
-
-      // ----------member data ---------------------------
-};
 
 //
 // constants, enums and typedefs
@@ -68,8 +33,37 @@ class QuantumEntanglementInPP : public edm::one::EDAnalyzer<edm::one::SharedReso
 QuantumEntanglementInPP::QuantumEntanglementInPP(const edm::ParameterSet& iConfig)
 
 {
-   //now do what ever initialization is needed
-   usesResource("TFileService");
+  trackName_  =  iConfig.getParameter<edm::InputTag>("trackName");
+  vertexName_ =  iConfig.getParameter<edm::InputTag>("vertexName");
+  towerName_ =  iConfig.getParameter<edm::InputTag>("towerName");
+
+  trackSrc_ = consumes<reco::TrackCollection>(trackName_);
+  vertexSrc_ = consumes<reco::VertexCollection>(vertexName_);
+  towerSrc_ = consumes<CaloTowerCollection>(towerName_);
+
+  Nmin_ = iConfig.getUntrackedParameter<int>("Nmin");
+  Nmax_ = iConfig.getUntrackedParameter<int>("Nmax");
+
+  doEffCorrection_ = iConfig.getUntrackedParameter<bool>("doEffCorrection");
+  useEtaGap_ = iConfig.getUntrackedParameter<bool>("useEtaGap");
+  doGenParticle_ = iConfig.getUntrackedParameter<bool>("doGenParticle");
+
+
+  eff_ = iConfig.getUntrackedParameter<int>("eff");
+
+  vzLow_ = iConfig.getUntrackedParameter<double>("vzLow");
+  vzHigh_ = iConfig.getUntrackedParameter<double>("vzHigh");
+  
+  ptLow_ = iConfig.getUntrackedParameter<double>("ptLow");
+  ptHigh_ = iConfig.getUntrackedParameter<double>("ptHigh");
+
+  offlineptErr_ = iConfig.getUntrackedParameter<double>("offlineptErr", 0.0);
+  offlineDCA_ = iConfig.getUntrackedParameter<double>("offlineDCA", 0.0);
+  offlineChi2_ = iConfig.getUntrackedParameter<double>("offlineChi2", 0.0);
+  offlinenhits_ = iConfig.getUntrackedParameter<double>("offlinenhits", 0.0);
+
+  etaBins_ = iConfig.getUntrackedParameter<std::vector<double>>("etaBins");
+  ptBins_ = iConfig.getUntrackedParameter<std::vector<double>>("ptBins");
 
 }
 
@@ -92,18 +86,27 @@ void
 QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
+   using namespace std;
 
+   if( doGenParticle_ ){
+    edm::Handle<reco::GenParticleCollection> genParticleCollection;
+    iEvent.getByToken(genSrc_, genParticleCollection);
+    
+    for(unsigned it=0; it<genParticleCollection->size(); ++it) {
 
+      const reco::GenParticle & genCand = (*genParticleCollection)[it];
+      int status = genCand.status();
+      //double geneta = genCand.eta();
+      int gencharge = genCand.charge();
+      //double genrapidity = genCand.rapidity();
+      double mass = genCand.mass();
 
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
+      if( status != 1 || gencharge == 0 ) continue;
+
+       cout << "mass " << mass << endl;
+    }
+  }
+
 }
 
 
@@ -111,13 +114,46 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
 void 
 QuantumEntanglementInPP::beginJob()
 {
-}
+  edm::Service<TFileService> fs;
+    
+  TH1D::SetDefaultSumw2();
 
+  const int NetaBins = etaBins_.size() - 1 ;
+
+  double ptBinsArray[100];
+  const int Nptbins = ptBins_.size() - 1;
+  for(unsigned i = 0; i < ptBins_.size(); i++){
+    ptBinsArray[i] = ptBins_[i];
+  }
+
+  // edm::FileInPath fip1("QuantumEntanglementInPP/QuantumEntanglementInPP/data/Hydjet_eff_mult_v1.root");
+  // TFile f1(fip1.fullPath().c_str(),"READ");
+  // for(int i = 0; i < 5; i++){
+  //    effTable[i] = (TH2D*)f1.Get(Form("rTotalEff3D_%d",i));
+  // }
+
+  Ntrk = fs->make<TH1D>("Ntrk",";Ntrk",5000,0,5000);
+  vtxZ = fs->make<TH1D>("vtxZ",";vz", 400,-20,20);
+  cbinHist = fs->make<TH1D>("cbinHist",";cbin",200,0,200);
+  trkPhi = fs->make<TH1D>("trkPhi", ";#phi", 700, -3.5, 3.5);
+  hfPhi = fs->make<TH1D>("hfPhi", ";#phi", 700, -3.5, 3.5);
+  trkPt = fs->make<TH1D>("trkPt", ";p_{T}(GeV)", Nptbins,ptBinsArray);
+  trk_eta = fs->make<TH1D>("trk_eta", ";#eta", 50,-2.5,2.5);
+
+}
+TComplex 
+QuantumEntanglementInPP::q_vector(double n, double p, double w, double phi) 
+{
+  double term1 = pow(w,p);
+  TComplex e(1, n*phi, 1);
+  return term1*e;
+}
 // ------------ method called once each job just after ending the event loop  ------------
 void 
 QuantumEntanglementInPP::endJob() 
 {
 }
+
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
