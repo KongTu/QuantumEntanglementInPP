@@ -107,7 +107,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
       int gencharge = genCand.charge();
       double genpt = genCand.pt();
       double mass = genCand.mass();
-      double E = genCand.E();
+      double E = genCand.Energy();
       double px = genCand.px();
       double py = genCand.py();
       double pz = genCand.pz();
@@ -119,7 +119,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
 
       if( status != 1 || gencharge == 0 ) continue;
 
-      if( fabs(pdgid) == 13 && charge == 1 ) {
+      if( fabs(pdgid) == 13 && gencharge == 1 ) {
         numOfMuons++; 
         fourVectorPositive.push_back(E);
         fourVectorPositive.push_back(px);
@@ -134,7 +134,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
         trk_eta->Fill(geneta);
       }
 
-      if( fabs(pdgid) == 13 && charge == -1 ) {
+      if( fabs(pdgid) == 13 && gencharge == -1 ) {
         numOfMuons++; 
         fourVectorNegative.push_back(E);
         fourVectorNegative.push_back(px);
