@@ -164,17 +164,8 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
 
     for(unsigned i = 0; i < MuonListPositive.size(); i++){
       for(unsigned j = 0; j < MuonListNegative.size(); j++){
-
-        TLorentzVector v1(MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3],MuonListPositive[i][0]);
-        TLorentzVector v2(MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3],MuonListNegative[j][0]);
-        
-        TLorentzVector v = v1+v2; //mass
-        double s = v.Mag2();
-
+  
         double s2 = GetInvariantMass(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3], MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
-
-        cout << "mass " << -s << endl;
-        cout << "true mass " << s2 << endl;
 
         diMuonMass->Fill(s2);
 
@@ -224,7 +215,7 @@ QuantumEntanglementInPP::beginJob()
 
   MuonsHist = fs->make<TH1D>("MuonsHist",";MuonsHist",100,0,100);
   ElectronsHist = fs->make<TH1D>("ElectronsHist",";ElectronsHist",100,0,100);
-  diMuonMass = fs->make<TH1D>("diMuonMass",";diMuonMass",100,0,200);
+  diMuonMass = fs->make<TH1D>("diMuonMass",";diMuonMass",200,0,200);
 
 }
 
