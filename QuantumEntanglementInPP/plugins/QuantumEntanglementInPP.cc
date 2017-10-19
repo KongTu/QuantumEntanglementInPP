@@ -162,6 +162,8 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
         
         double s = v1*v2; //mass
 
+        cout << "mass " << s << endl;
+
         diMuonMass->Fill(s);
 
       }
