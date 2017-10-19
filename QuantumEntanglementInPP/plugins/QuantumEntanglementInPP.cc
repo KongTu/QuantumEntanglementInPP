@@ -96,6 +96,8 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
     
     double numOfMuons = 0;
     double numOfElections = 0;
+    vector< vector<double>> MuonListPositive;
+    vector< vector<double>> MuonListNegative;
 
     for(unsigned it=0; it<genParticleCollection->size(); ++it) {
 
@@ -103,14 +105,66 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
       int status = genCand.status();
       double geneta = genCand.eta();
       int gencharge = genCand.charge();
+      double genpt = genCand.pt();
       double mass = genCand.mass();
+      double E = genCand.E();
+      double px = genCand.px();
+      double py = genCand.py();
+      double pz = genCand.pz();
+
       int pdgid = genCand.pdgId();
+
+      vector<double> fourVectorPositive;
+      vector<double> fourVectorNegative;
 
       if( status != 1 || gencharge == 0 ) continue;
 
-      if( fabs(pdgid) == 13 ) numOfMuons++; 
+      if( fabs(pdgid) == 13 && charge == 1 ) {
+        numOfMuons++; 
+        fourVectorPositive.push_back(E);
+        fourVectorPositive.push_back(px);
+        fourVectorPositive.push_back(py);
+        fourVectorPositive.push_back(pz);
+
+        MuonListPositive.push_back(fourVectorPositive);
+
+        fourVectorPositive.clear();
+
+        trkPt->Fill(genpt);
+        trk_eta->Fill(geneta);
+      }
+
+      if( fabs(pdgid) == 13 && charge == -1 ) {
+        numOfMuons++; 
+        fourVectorNegative.push_back(E);
+        fourVectorNegative.push_back(px);
+        fourVectorNegative.push_back(py);
+        fourVectorNegative.push_back(pz);
+
+        MuonListNegative.push_back(fourVectorNegative);
+        
+        fourVectorNegative.clear();
+
+        trkPt->Fill(genpt);
+        trk_eta->Fill(geneta);
+
+      }
+
       if( fabs(pdgid) == 11 ) numOfElections++;
 
+    }
+
+    for(unsigned i = 0; i < MuonListPositive.size(); i++){
+      for(unsigned j = 0; j < MuonListNegative.size(); j++){
+
+        TLorentzVector v1(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3]);
+        TLorentzVector v2(MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
+        
+        double s = v1*v2; //mass
+
+        diMuonMass->Fill(s);
+
+      }
     }
 
     MuonsHist->Fill( numOfMuons );
@@ -152,9 +206,9 @@ QuantumEntanglementInPP::beginJob()
   trkPt = fs->make<TH1D>("trkPt", ";p_{T}(GeV)", Nptbins,ptBinsArray);
   trk_eta = fs->make<TH1D>("trk_eta", ";#eta", 50,-2.5,2.5);
 
-
   MuonsHist = fs->make<TH1D>("MuonsHist",";MuonsHist",100,0,100);
   ElectronsHist = fs->make<TH1D>("ElectronsHist",";ElectronsHist",100,0,100);
+  diMuonMass = fs->make<TH1D>("diMuonMass",";diMuonMass",100,0,200);
 
 }
 
