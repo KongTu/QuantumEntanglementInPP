@@ -168,7 +168,8 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
         TLorentzVector v1(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3]);
         TLorentzVector v2(MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
         
-        double s = v1*v2; //mass
+        TLorentzVector v = v1+v2; //mass
+        double s = -v.Mag2();
 
         double s2 = GetInvariantMass(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3], MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
 
@@ -179,6 +180,8 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
 
       }
     }
+
+
 
     MuonsHist->Fill( numOfMuons );
     ElectronsHist->Fill( numOfElections );
