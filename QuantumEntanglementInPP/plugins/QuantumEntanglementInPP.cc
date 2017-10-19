@@ -170,7 +170,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
   
         double s2 = GetInvariantMass(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3], MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
         diMuonMass->Fill(s2);
-        for( int k = 0; k < momentum.size(); k++){
+        for( unsigned k = 0; k < momentum.size(); k++){
 
           MassVsPt->Fill(s2, momentum[k]);
 
