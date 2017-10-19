@@ -128,9 +128,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
 
       if( status != 1 || gencharge == 0 ) continue;
 
-      //if( fabs(pdgid) == 211 || fabs(pdgid) == 111) 
-
-      momentum.push_back(genpt);
+      if( fabs(pdgid) != 13 && fabs(pdgid) != 11) momentum.push_back(genpt);
 
       if( fabs(pdgid) == 13 && gencharge == 1 ) {
         numOfMuons++; 
