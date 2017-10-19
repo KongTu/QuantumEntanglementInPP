@@ -107,10 +107,10 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
       int gencharge = genCand.charge();
       double genpt = genCand.pt();
       double mass = genCand.mass();
-      double E = genCand.Energy();
       double px = genCand.px();
       double py = genCand.py();
       double pz = genCand.pz();
+      double E = sqrt(px*px+py*py+pz*pz+mass*mass);
 
       int pdgid = genCand.pdgId();
 
