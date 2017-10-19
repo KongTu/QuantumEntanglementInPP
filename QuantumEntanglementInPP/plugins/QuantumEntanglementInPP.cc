@@ -81,6 +81,14 @@ QuantumEntanglementInPP::~QuantumEntanglementInPP()
 //
 // member functions
 //
+double GetInvariantMass(double E1, double px_1,double py_1,double pz_1,double E2, double px_2,double py_2,double pz_2)
+{
+       
+  double temp = 0.0;
+  double E_tot = E1+E2;
+  temp = (E_tot*E_tot) - ((px_1+px_2)*(px_1+px_2)+(py_1+py_2)*(py_1+py_2)+(pz_1+pz_2)*(pz_1+pz_2));
+  return sqrt(temp);
+}
 
 // ------------ method called for each event  ------------
 void
@@ -162,9 +170,12 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
         
         double s = v1*v2; //mass
 
-        cout << "mass " << s << endl;
+        double s2 = GetInvariantMass(MuonListPositive[i][0], MuonListPositive[i][1], MuonListPositive[i][2], MuonListPositive[i][3], MuonListNegative[j][0], MuonListNegative[j][1], MuonListNegative[j][2], MuonListNegative[j][3]);
 
-        diMuonMass->Fill(s);
+        cout << "mass " << -s << endl;
+        cout << "true mass " << s2 << endl;
+
+        diMuonMass->Fill(s2);
 
       }
     }
