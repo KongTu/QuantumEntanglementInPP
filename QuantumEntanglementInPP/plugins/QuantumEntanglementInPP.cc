@@ -126,7 +126,7 @@ QuantumEntanglementInPP::analyze(const edm::Event& iEvent, const edm::EventSetup
       vector<double> fourVectorPositive;
       vector<double> fourVectorNegative;
 
-      if( status != 1 || gencharge == 0 ) continue;
+      if( status != 1 || gencharge == 0 || fabs(geneta) > 2.4 ) continue;
 
       if( fabs(pdgid) != 13 && fabs(pdgid) != 11) momentum.push_back(genpt);
 
